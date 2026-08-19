@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mira-Lux
 
-## Getting Started
+Сайт туристического агентства Mira-Lux (Ташкент). Два направления в одном
+проекте: приём иностранных гостей по Узбекистану (inbound/DMC) и продажа
+зарубежных туров, авиабилетов, отелей и виз местным клиентам (outbound).
+Три языка — ru/en/uz.
 
-First, run the development server:
+## Стек
+
+- Next.js 16 (App Router)
+- Tailwind CSS v4
+- shadcn/ui (Radix)
+- next/font — Bodoni Moda, Instrument Sans, Space Grotesk
+
+## Запуск
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Открыть http://localhost:3000 — редиректит на `/ru`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Продакшн-сборка:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Структура
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/[locale]/        роуты: / (главная), /uzbekistan, /world
+  components/site/     секции и компоненты страниц
+  components/ui/       shadcn-компоненты
+  lib/data/            туры, контакты, фото
+  lib/i18n/            словари ru/en/uz и конфиг локалей
+public/photos/         фотографии
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Локаль определяется сегментом `[locale]` в пути (`/ru`, `/en`, `/uz`),
+редирект с `/` на локаль по умолчанию делает `src/proxy.ts`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Контент
 
-## Deploy on Vercel
+- Тексты — в `src/lib/i18n/locales/{ru,en,uz}.ts`. Если добавляешь новый
+  тур, нужно прописать его перевод в `tours` во всех трёх файлах — иначе
+  типы не соберутся (см. `src/lib/i18n/dictionary.ts`).
+- Список туров, цены, маршруты — `src/lib/data/tours.ts`. Цена `null`
+  выводится как «цена по запросу».
+- Контакты, телефоны, ссылки на соцсети — `src/lib/data/contact.ts`.
+- Форма заявки ничего никуда не отправляет сама — она собирает данные и
+  открывает WhatsApp с готовым текстом (см. `src/lib/whatsapp.ts`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Фото
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Сейчас в `public/photos` лежат временные фотографии (см.
+`public/photos/CREDITS.md` — источники и лицензии). Это заглушки, перед
+реальным запуском их нужно заменить на съёмку агентства.
+
+## Деплой
+
+Проект живёт на Vercel, подключён к этому репозиторию — пуш в `main`
+триггерит деплой.
